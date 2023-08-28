@@ -1,3 +1,0 @@
-/Users/patrickbrown/Developer/ChatGPT_CLI/build/CMakeFiles/chatgpt_cli.dir
-/Users/patrickbrown/Developer/ChatGPT_CLI/build/CMakeFiles/edit_cache.dir
-/Users/patrickbrown/Developer/ChatGPT_CLI/build/CMakeFiles/rebuild_cache.dir
