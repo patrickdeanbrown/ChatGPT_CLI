@@ -10,7 +10,7 @@
 
 void ChatHistory::addDialog(const std::string &participantName, const std::string &message)
 {
-    else if (message.empty())
+    if (message.empty())
     {
         std::cerr << "Unable to add to ChatHistory. message is empty." << std::endl;
         return;
