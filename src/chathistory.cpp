@@ -8,13 +8,8 @@
 #include <string>
 #include <termcolor/termcolor.hpp>
 
-void ChatHistory::addDialog(const std::string& participantName, const std::string& message)
+void ChatHistory::addDialog(const std::string &participantName, const std::string &message)
 {
-    if(participantName != "user" || participantName != "assistant")
-    {
-        std::cerr << "Unable to add to chat history. participantName is invalid." << std::endl;
-        return;
-    }
     else if (message.empty())
     {
         std::cerr << "Unable to add to ChatHistory. message is empty." << std::endl;
@@ -25,7 +20,7 @@ void ChatHistory::addDialog(const std::string& participantName, const std::strin
 
 void ChatHistory::removeLastDialog()
 {
-    if(m_chatHistory.empty())
+    if (m_chatHistory.empty())
     {
         std::cerr << "ChatHistory is empty. Cannot remove last dialog." << std::endl;
         return;
@@ -40,7 +35,7 @@ void ChatHistory::clearHistory()
 
 void ChatHistory::printHistory() const
 {
-    if(m_chatHistory.empty())
+    if (m_chatHistory.empty())
     {
         std::cerr << "ChatHistory is empty. Unable to print." << std::endl;
     }
@@ -63,7 +58,7 @@ std::string ChatHistory::toString() const
 
 void ChatHistory::printLastDialog() const
 {
-    if(m_chatHistory.empty())
+    if (m_chatHistory.empty())
     {
         std::cerr << "ChatHistory is empty. Unable to print last dialog." << std::endl;
     }
