@@ -106,7 +106,8 @@ void quitCommand()
 void helpCommand()
 {
     const int maxWidth = 30;
-    std::cout << "***** HELP MENU *****" << std::endl << std::endl;
+    std::cout << "***** HELP MENU *****" << std::endl
+              << std::endl;
     std::cout << std::left << std::setw(maxWidth) << "%save [filename]"
               << "Saves your chat as a file." << std::endl;
     std::cout << std::left << std::setw(maxWidth) << "%readfile [filename]"
