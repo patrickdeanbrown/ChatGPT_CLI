@@ -9,6 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 void wrap(std::string const &input, size_t width, std::ostream &os, size_t defaultIndent = 0)
 {
