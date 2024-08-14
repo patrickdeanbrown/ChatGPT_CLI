@@ -16,7 +16,7 @@ std::string makeRequest(const std::string &message, ChatHistory &chatHistory)
 
     // Build JSON payload
     nlohmann::json payload;
-    payload["model"] = "gpt-4";
+    payload["model"] = "chatgpt-4o-latest";
 
     // Add chat history
     for (const auto &[role, content] : chatHistory)
