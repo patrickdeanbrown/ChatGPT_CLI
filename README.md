@@ -35,7 +35,7 @@ This project was conceived and developed with the following goals in mind:
 1. **Install Prerequisites**:
    - Install `libcurl`, `nlohmann/json`, and `termcolor` using Homebrew:
      ```sh
-     brew install curl nlohmann-json
+     brew install curl nlohmann-json termcolor
      ```
 
 2. **Clone the Repository**:
@@ -64,10 +64,11 @@ This project was conceived and developed with the following goals in mind:
      ```sh
      sudo apt-get install libcurl4-openssl-dev
      ```
-   - Install `nlohmann/json` and `termcolor`:
+   - Install `nlohmann/json`:
      ```sh
      sudo apt-get install nlohmann-json3-dev
      ```
+   - Install `termcolor` via installation instructions on its repo [termcolor](https://github.com/ikalnytskyi/termcolor) 
 
 2. **Clone the Repository**:
    ```sh
