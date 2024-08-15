@@ -2,6 +2,8 @@
 
 ChatGPT CLI is a command-line interface for chatting with OpenAI's ChatGPT API built from start to finish with an AI-first product development workflow.
 
+![Demo Video](assets/demo.apng)
+
 ## Table of Contents
 
 - [Introduction](#introduction)
