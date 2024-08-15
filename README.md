@@ -103,4 +103,4 @@ This key is required to authenticate your requests to the ChatGPT API.
 
 ## License
 
-This project is licensed under the BSD-2 License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the BSD 2-Clause License. See the [LICENSE](LICENSE) file for details.
