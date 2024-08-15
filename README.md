@@ -20,6 +20,7 @@ ChatGPT CLI is a command-line interface for chatting with OpenAI's ChatGPT API b
 ChatGPT CLI is a lightweight, flexible command-line tool that allows users to chat via OpenAI's ChatGPT API directly from their terminal. The application provides a simple interface for sending messages to ChatGPT, viewing chat history, and saving conversations
 
 This project was conceived and developed with the following goals in mind:
+
 - **AI-First Workflow**: The project showcases the application of AI in product management and software development, highlighting how AI tools can be used effectively in the creation of software products.
 - **Educational and Demonstrative Value**: Beyond its functionality, this project serves as a demonstration of my ability to manage the end-to-end product development process, from ideation and design to implementation and deployment.
 
@@ -86,22 +87,31 @@ This project was conceived and developed with the following goals in mind:
    make
    ```
 
-4. **Run the Application**:
+4. **Set up ChatGPT API Key**
+   
+   The app calls the ChatGPT API and will need the following environment variable set up.
+   ```sh
+   export OPENAI_KEY="your-openai-api-key"
+   ```
+
+5. **Run the Application**:
    ```sh
    ./chatgpt_cli
    ```
 
+
 ## Usage
 
-After installing and running the application, you can start interacting with ChatGPT by typing your message and pressing Enter. Use the `%help` command to see a list of available commands.
+Inspired by magic commands in Python notebooks, commands are preceeded by `%` and can be entered in after the prompt.
 
-Before running the application, make sure to set your OpenAI API key:
+- %save [filename]              Saves your chat as a file.
+- %readfile [filename]          Reads in a file from the cwd.
+- %clear                        Clears the chat history.
+- %deletelast                   Deletes the last record in the chat history.
+- %printhistory                 Prints the chat history to the console.
+- %quit                         Exits the program.
+- %help                         Prints the help menu.
 
-```sh
-export OPENAI_KEY="your-openai-api-key"
-```
-
-This key is required to authenticate your requests to the ChatGPT API.
 
 ## License
 
