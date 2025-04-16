@@ -16,7 +16,7 @@ std::string makeRequest(const std::string &message, ChatHistory &chatHistory)
 
     // Build JSON payload
     nlohmann::json payload;
-    payload["model"] = "chatgpt-4o-latest";
+    payload["model"] = "gpt-4o"; // Updated to latest supported model
 
     // Add chat history
     for (const auto &[role, content] : chatHistory)
@@ -47,11 +47,13 @@ std::string makeRequest(const std::string &message, ChatHistory &chatHistory)
         struct curl_slist *headers = nullptr;
         headers = curl_slist_append(headers, "Content-Type: application/json");
 
-        // get API KEY
+        // Get API KEY from environment and check for presence
         const char *api_key = std::getenv("OPENAI_KEY");
-        if (api_key == nullptr)
+        if (api_key == nullptr || std::string(api_key).empty())
         {
-            std::cerr << "OPENAI_KEY environment variable not set." << std::endl;
+            std::cerr << "[ERROR] OPENAI_KEY environment variable not set. Please set it before running the CLI." << std::endl;
+            curl_easy_cleanup(curl);
+            curl_slist_free_all(headers);
             return "";
         }
         std::string auth_header = "Authorization: Bearer " + std::string(api_key);
@@ -83,9 +85,36 @@ std::string makeRequest(const std::string &message, ChatHistory &chatHistory)
 
 std::string getChatGPTResponseContent(const std::string &jsonStr)
 {
-    nlohmann::json jsonResponse = nlohmann::json::parse(jsonStr);
-    std::string response = jsonResponse["choices"][0]["message"]["content"];
-    return response;
+    // Parse the response and extract the assistant's message content
+    try {
+        nlohmann::json jsonResponse = nlohmann::json::parse(jsonStr);
+        // If there is an error field, print it for the user
+        if (jsonResponse.contains("error")) {
+            std::string errMsg = jsonResponse["error"].contains("message") ? jsonResponse["error"]["message"].get<std::string>() : "Unknown error";
+            std::cerr << "[OPENAI API ERROR] " << errMsg << std::endl;
+            // Optionally print more details if available
+            if (jsonResponse["error"].contains("type")) {
+                std::cerr << "  Type: " << jsonResponse["error"]["type"] << std::endl;
+            }
+            if (jsonResponse["error"].contains("code")) {
+                std::cerr << "  Code: " << jsonResponse["error"]["code"] << std::endl;
+            }
+            return "";
+        }
+        if (!jsonResponse.contains("choices") || !jsonResponse["choices"].is_array() || jsonResponse["choices"].empty()) {
+            std::cerr << "[ERROR] API response missing 'choices' array. Full response:\n" << jsonStr << std::endl;
+            return "";
+        }
+        if (!jsonResponse["choices"][0].contains("message") || !jsonResponse["choices"][0]["message"].contains("content")) {
+            std::cerr << "[ERROR] API response missing 'message.content'. Full response:\n" << jsonStr << std::endl;
+            return "";
+        }
+        std::string response = jsonResponse["choices"][0]["message"]["content"];
+        return response;
+    } catch (const std::exception &e) {
+        std::cerr << "[ERROR] Failed to parse API response: " << e.what() << "\nFull response:\n" << jsonStr << std::endl;
+        return "";
+    }
 }
 
 size_t _writeCallback(void *contents, size_t size, size_t nmemb, void *userp)

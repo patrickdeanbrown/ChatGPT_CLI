@@ -1,41 +1,35 @@
-//  filereadwrite.hpp
+//  filereadwrite.cpp
 //
 // File reading and writing utilities
 
 #include "filereadwrite.hpp"
-#include <fstream>
 #include <iostream>
 #include <sstream>
-#include <unistd.h>
+#include <filesystem>
 
-std::string getCurrentWorkingDirectory()
+std::filesystem::path getCurrentWorkingDirectory()
 {
-    char cwd[PATH_MAX];
-    if (getcwd(cwd, sizeof(cwd)) != nullptr)
-    {
-        return std::string(cwd);
-    }
-    else
-    {
-        std::cerr << "Error getting current working directory" << std::endl;
-        return "";
+    try {
+        return std::filesystem::current_path();
+    } catch (const std::filesystem::filesystem_error& e) {
+        std::cerr << "Error getting current working directory: " << e.what() << std::endl;
+        return {};
     }
 }
 
-std::ofstream openFileForWriting(const std::string &filename)
+std::ofstream openFileForWriting(const std::filesystem::path &filepath)
 {
-    std::string path = getCurrentWorkingDirectory() + "/" + filename;
-    std::ofstream file(path);
+    std::ofstream file(filepath);
     if (!file.is_open())
     {
-        std::cerr << "failed to open file: " << path << std::endl;
+        std::cerr << "Failed to open file: " << filepath << std::endl;
     }
     return file;
 }
 
-void writeToFile(const std::string &filename, const std::string &content)
+void writeToFile(const std::filesystem::path &filepath, const std::string &content)
 {
-    std::ofstream file = openFileForWriting(filename);
+    std::ofstream file = openFileForWriting(filepath);
     if (file.is_open())
     {
         file << content;
@@ -43,15 +37,15 @@ void writeToFile(const std::string &filename, const std::string &content)
     }
 }
 
-std::string readFileToString(const std::string filename)
+std::string readFileToString(const std::filesystem::path &filepath)
 {
     // Read the entire file into the string using a string stream
     std::ostringstream ss;
-    std::ifstream ifs(filename);
+    std::ifstream ifs(filepath);
 
     if (!ifs.is_open())
     {
-        std::cerr << "failed to open file: " << filename << std::endl;
+        std::cerr << "Failed to open file: " << filepath << std::endl;
     }
 
     ss << ifs.rdbuf();

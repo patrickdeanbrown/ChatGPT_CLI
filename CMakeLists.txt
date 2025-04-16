@@ -10,6 +10,7 @@ set(SOURCES
     src/filereadwrite.cpp
     src/formatting.cpp
     src/request.cpp
+    src/apikeycheck.cpp
 )
 
 set(HEADERS

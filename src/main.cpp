@@ -4,12 +4,15 @@
 #include "chatgptapi.hpp"
 #include "command.hpp"
 #include "commandcontext.hpp"
+#include "apikeycheck.hpp"
 #include <iostream>
 #include <string>
 #include <termcolor/termcolor.hpp>
 
 int main()
 {
+    // Check if the OpenAI API key is valid before starting the CLI
+    checkOpenAIKeyOrExit();
     std::string commandLineInput;
     CommandContext commandContext;
     ChatHistory chatHistory;

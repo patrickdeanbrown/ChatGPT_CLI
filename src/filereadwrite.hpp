@@ -6,28 +6,26 @@
 #define filereadwrite_hpp
 
 #include <string>
+#include <filesystem>
+#include <fstream>
 
-/// @brief Returns the current working directory as a std::string
-///
-/// @return std::string the current working directory
-std::string getCurrentWorkingDirectory();
+/// @brief Returns the current working directory as a std::filesystem::path
+/// @return std::filesystem::path the current working directory
+std::filesystem::path getCurrentWorkingDirectory();
 
 /// @brief Opens a file in write mode and returns an output file stream
-///
-/// @returns std::ofstream an output file stream of the file
-std::ofstream openFileForWriting(const std::string &filename);
+/// @param filepath Path of the file to open for writing
+/// @return std::ofstream Output file stream of the file
+std::ofstream openFileForWriting(const std::filesystem::path &filepath);
 
 /// @brief Writes content to a file
-///
-/// @param filename const std::string& filename of the file to open and write to
-/// @param content const std::string& the content to write to the file
-void writeToFile(const std::string &filename, const std::string &content);
+/// @param filepath Path of the file to write to
+/// @param content Content to write to the file
+void writeToFile(const std::filesystem::path &filepath, const std::string &content);
 
-/// @brief Opens a file and reads the contents into an std::string
-///
-/// @param filename const std::string the name of the file to open and read
-///
-/// @return std::string the content of the file
-std::string readFileToString(const std::string filename);
+/// @brief Opens a file and reads the contents into a string
+/// @param filepath Path of the file to read
+/// @return Content of the file as a string
+std::string readFileToString(const std::filesystem::path &filepath);
 
 #endif /* filereadwrite_hpp */
