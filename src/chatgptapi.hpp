@@ -8,12 +8,16 @@
 #include "chathistory.hpp"
 #include <string>
 
-/// @brief Calls ChatGPT's API, stores the resulting content in chatHistory, and prints the user input
-/// and ChatGPT's content to the terminal
-///
-/// @param input std::string& User input to be passed to the ChatGPT API
-/// @param chatHistory &ChatHistory Context for calling the ChatGPT API and where the content
-/// returned from ChatGPT is stored
+/**
+ * @brief Sends a user message to the ChatGPT API and handles the response.
+ *
+ * Calls the ChatGPT API with the provided user input and the current chat history.
+ * Stores the assistant's response in the chat history and prints both the user input
+ * and the assistant's response to the terminal.
+ *
+ * @param input The user’s input message to send to the ChatGPT API.
+ * @param chatHistory The chat history object to provide context and store the new response.
+ */
 void callChatGPTAPI(const std::string &input, ChatHistory &chatHistory);
 
 #endif /* chatgptapi_hpp */

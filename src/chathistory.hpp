@@ -13,11 +13,40 @@
 class ChatHistory
 {
   public:
+    /**
+     * @brief Adds a dialog entry to the chat history.
+     * @param participantName The name of the participant ("user" or "assistant").
+     * @param message The message content to add.
+     */
     void addDialog(const std::string& participantName, const std::string& message);
+
+    /**
+     * @brief Removes the last dialog entry from the chat history.
+     * If the history is empty, no action is taken.
+     */
     void removeLastDialog();
+
+    /**
+     * @brief Prints the most recent dialog entry to the console.
+     * If the history is empty, prints a warning.
+     */
     void printLastDialog() const;
+
+    /**
+     * @brief Clears all dialog entries from the chat history.
+     */
     void clearHistory();
+
+    /**
+     * @brief Prints the entire chat history to the console.
+     * If the history is empty, prints a warning.
+     */
     void printHistory() const;
+
+    /**
+     * @brief Converts the chat history to a formatted string.
+     * @return A string representation of all chat entries.
+     */
     std::string toString() const;
 
     /// @class iterator.

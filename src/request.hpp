@@ -8,29 +8,34 @@
 #include "chathistory.hpp"
 #include <string>
 
-/// @brief Calls ChatGPT API using cURL passing the API both a new message and the chat history for context
-///
-/// @param message const std::string& the next user message to pass to ChatGPT
-/// @param chatHistory ChatHistory& the chat history to pass to ChatGPT for context
-///
-/// @return std::string JSON formatted string containing the raw response from ChatGPT
+/**
+ * @brief Calls the ChatGPT API using cURL, sending a new message and chat history for context.
+ *
+ * @param message The next user message to send to ChatGPT.
+ * @param chatHistory The chat history to provide context for the API request.
+ * @return A JSON-formatted string containing the raw response from ChatGPT.
+ * @throws std::runtime_error if the request fails or the response is invalid.
+ */
 std::string makeRequest(const std::string &message, ChatHistory &chatHistory);
 
-/// @brief Parses raw json to extract content returned by the ChatGPT API
-///
-/// @param jsonStr std::string& JSON object stored as a string to be parsed
-///
-/// @return std::string containing the context of the ChatGPT API response
+/**
+ * @brief Parses a raw JSON response to extract the content returned by the ChatGPT API.
+ *
+ * @param jsonStr The JSON response as a string.
+ * @return The assistant's message content as a string.
+ * @throws std::runtime_error if parsing fails or the expected fields are missing.
+ */
 std::string getChatGPTResponseContent(const std::string &jsonStr);
 
-/// @brief Supports cURL to write contents of request into a buffer
-///
-/// @param contents void pointer to the contents of the request response, typically a char buffer
-/// @param size size_t size in bytes of the object making up contents, typically sizeof(char)
-/// @param nmemb size_t number of objects in contents
-/// @param userp void pointer to the object where contents will be written to, typically std::string or char buffer
-///
-/// @return size_t of the number of bytes written
+/**
+ * @brief cURL write callback to write contents of a response into a buffer.
+ *
+ * @param contents Pointer to the data received.
+ * @param size Size of each data element.
+ * @param nmemb Number of elements.
+ * @param userp Pointer to the buffer where data should be written.
+ * @return The number of bytes actually taken care of.
+ */
 size_t _writeCallback(void *contents, size_t size, size_t nmemb, void *userp);
 
 #endif /* request_hpp */

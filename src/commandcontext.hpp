@@ -15,36 +15,40 @@
 class CommandContext
 {
   public:
-    /// @brief Member function of ComandContext. Parses a string in the form
-    /// of "%command [arg1 arg2]" and separates the command and arguments.
-    /// Overwrites the member variables m_command and m_arguments.
-    ///
-    /// @param rawCommandInput std::string expected in the form of
-    /// "%command [arg1 arg2]"
+    /**
+     * @brief Parses a raw command string and separates it into the command and its arguments.
+     * @param rawCommandInput The raw input string in the form "%command [arg1 arg2]".
+     */
     void setCommandAndArgs(const std::string& rawCommandInput);
 
-    /// @brief Member function of CommandContext. Getter for m_command.
-    ///
-    /// @return m_command std::string
+    /**
+     * @brief Returns the parsed command string.
+     * @return The command extracted from the raw input.
+     */
     std::string getCommand() const;
 
-    /// @brief Member function of CommandContext. Getter for m_arguments.
-    /// @param argumentIndex size_t the index of the argument to return.
-    /// @return argument at a specified index std::string
+    /**
+     * @brief Returns the argument at the specified index.
+     * @param argumentIndex The index of the argument to return.
+     * @return The argument at the specified index.
+     * @throws std::out_of_range if the index is invalid.
+     */
     std::string getArgument(size_t argumentIndex) const;
     
-    /// @brief Member function of CommandContext. Getter for the size of m_arguments
-    /// @return size_t the size of m_arguments
+    /**
+     * @brief Returns the number of parsed arguments.
+     * @return The number of arguments.
+     */
     size_t getArgumentsSize() const;
 
   private:
     std::string m_command;
     std::vector<std::string> m_arguments;
 
-    /// @brief CommandContext member function. Parses a raw string containing a command keyword and arguments
-    /// in the form of "%command arg1 arg2 arg3". It changes the member variables command and arguments
-    ///
-    /// @param rawCommandInput std::string in the form of "%command arg1 arg2 arg3"
+    /**
+     * @brief Parses a raw string containing a command keyword and arguments and updates member variables.
+     * @param rawCommandInput The raw string in the form "%command arg1 arg2 arg3".
+     */
     void _parseCommand(const std::string& rawCommandInput);
 };
 

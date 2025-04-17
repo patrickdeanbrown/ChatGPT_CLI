@@ -4,8 +4,15 @@
 #ifndef APIKEYCHECK_HPP
 #define APIKEYCHECK_HPP
 
-/// Checks if the OpenAI API key is valid by making a minimal request to OpenAI's API.
-/// If the key is invalid or inactive, prints an error and exits the program.
+/**
+ * @brief Checks the validity of the OpenAI API key at program startup.
+ *
+ * Makes a minimal request to the OpenAI API to verify the key.
+ * If the key is missing, invalid, or inactive, prints an error message and terminates the program.
+ * This function does not return if the key is not valid.
+ *
+ * @note This function should be called before any other OpenAI API operations.
+ */
 void checkOpenAIKeyOrExit();
 
 #endif // APIKEYCHECK_HPP

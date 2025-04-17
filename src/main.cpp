@@ -10,6 +10,14 @@
 #include <termcolor/termcolor.hpp>
 #include "linenoise.h" // Added for improved line editing
 
+/**
+ * @brief Entry point for the ChatGPT CLI application.
+ *
+ * Initializes the environment, validates the OpenAI API key,
+ * and runs the main user input loop, handling commands and chat requests.
+ *
+ * @return int Exit code (0 for normal termination).
+ */
 int main()
 {
     // Check if the OpenAI API key is valid before starting the CLI
