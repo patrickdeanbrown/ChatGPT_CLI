@@ -11,6 +11,7 @@ set(SOURCES
     src/formatting.cpp
     src/request.cpp
     src/apikeycheck.cpp
+    external/linenoise/linenoise.c
 )
 
 set(HEADERS
@@ -27,4 +28,5 @@ find_package(CURL REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(termcolor REQUIRED)
 add_executable(chatgpt_cli ${SOURCES} ${HEADERS})
+target_include_directories(chatgpt_cli PRIVATE external/linenoise)
 target_link_libraries(chatgpt_cli termcolor::termcolor CURL::libcurl nlohmann_json::nlohmann_json)

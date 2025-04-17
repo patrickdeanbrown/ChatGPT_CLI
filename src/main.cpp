@@ -8,20 +8,26 @@
 #include <iostream>
 #include <string>
 #include <termcolor/termcolor.hpp>
+#include "linenoise.h" // Added for improved line editing
 
 int main()
 {
     // Check if the OpenAI API key is valid before starting the CLI
     checkOpenAIKeyOrExit();
-    std::string commandLineInput;
     CommandContext commandContext;
     ChatHistory chatHistory;
 
     // Main program loop
     while (true)
     {
-        std::cout << "ChatGPT> ";
-        std::getline(std::cin, commandLineInput);
+        // Use linenoise for line editing and history
+        char* input = linenoise("ChatGPT> ");
+        if (input == nullptr) {
+            std::cout << std::endl;
+            break; // EOF (Ctrl-D)
+        }
+        std::string commandLineInput(input);
+        linenoiseFree(input);
 
         if (!commandLineInput.empty() && commandLineInput[0] == '%')
         {
