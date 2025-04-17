@@ -45,7 +45,7 @@ std::string readFileToString(const std::filesystem::path &filepath)
 
     if (!ifs.is_open())
     {
-        std::cerr << "Failed to open file: " << filepath << std::endl;
+        throw std::runtime_error("Failed to open file: " + filepath.string());
     }
 
     ss << ifs.rdbuf();
