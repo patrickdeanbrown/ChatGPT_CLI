@@ -114,6 +114,58 @@ Inspired by magic commands in Python notebooks, commands are preceded by `%` and
 - `%quit` — Exit the program.
 - `%help` — Display the help menu.
 
+## Running Unit Tests
+
+This project uses [Google Test](https://github.com/google/googletest) for unit testing. The tests are built as part of the standard build process if Google Test is found by CMake (it's configured to be fetched automatically if not present).
+
+To build and run the unit tests:
+
+1.  **Navigate to the Build Directory**:
+    If you haven't built the project yet, or to ensure a clean build for tests:
+    ```sh
+    # From the project root directory
+    rm -rf build # Optional: for a clean start
+    mkdir build
+    cd build
+    ```
+
+2.  **Configure with CMake**:
+    This step prepares the build system.
+    ```sh
+    cmake ..
+    ```
+
+3.  **Build the Tests**:
+    You can build all targets, which includes the `unit_tests` executable, or build the `unit_tests` target specifically.
+    ```sh
+    make unit_tests
+    ```
+    Alternatively, to build all targets:
+    ```sh
+    make
+    ```
+
+4.  **Run the Tests**:
+    There are two common ways to run the tests from the `build` directory:
+
+    *   **Using CTest**:
+        CTest is CMake's testing tool. It will discover and run tests automatically.
+        ```sh
+        ctest
+        ```
+        For more verbose output, especially on failures:
+        ```sh
+        ctest --output-on-failure
+        ```
+
+    *   **Running the Executable Directly**:
+        You can also run the compiled test executable directly.
+        ```sh
+        ./unit_tests
+        ```
+
+All tests should pass if the environment is configured correctly and there are no issues with the code.
+
 ## License
 
 This project is licensed under the BSD 2-Clause License. See the [LICENSE](LICENSE) file for details.

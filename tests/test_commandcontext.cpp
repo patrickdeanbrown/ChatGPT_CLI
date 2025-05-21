@@ -39,3 +39,16 @@ TEST(CommandContextTest, HandlesWhitespaceInput) {
     EXPECT_EQ(ctx.getCommand(), "%clear");
     EXPECT_EQ(ctx.getArgumentsSize(), 0);
 }
+
+TEST(CommandContextTest, GetArgumentOutOfBounds) {
+    CommandContext ctx;
+    ctx.setCommandAndArgs("%cmd arg1");
+    
+    // Test with index equal to size
+    // Expect empty string and an error message to cerr (not easily testable here for cerr)
+    EXPECT_EQ(ctx.getArgument(1), ""); 
+
+    // Test with index greater than size
+    EXPECT_EQ(ctx.getArgument(5), "");
+
+}
