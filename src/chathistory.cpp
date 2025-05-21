@@ -50,7 +50,7 @@ std::string ChatHistory::toString() const
     std::string output;
     for (const auto &[role, response] : m_chatHistory)
     {
-        output.append(role + ":\n" + response + "\n\n");
+        output.append(role + ": " + response + "\n"); // Corrected format
     }
 
     return output;
@@ -61,6 +61,7 @@ void ChatHistory::printLastDialog() const
     if (m_chatHistory.empty())
     {
         std::cerr << "ChatHistory is empty. Unable to print last dialog." << std::endl;
+        return; // Prevent further execution if history is empty
     }
     printFormatted(m_chatHistory.back());
 }

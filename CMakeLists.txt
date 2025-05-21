@@ -25,7 +25,8 @@ set(HEADERS
 
 find_package(CURL REQUIRED)
 find_package(nlohmann_json REQUIRED)
-find_package(termcolor REQUIRED)
+# find_package(termcolor REQUIRED) # Removed: termcolor is now a subdirectory
+add_subdirectory(external/termcolor)
 
 # Build static library from all code except main.cpp
 add_library(chatgpt_cli_lib STATIC ${SOURCES} ${HEADERS})
