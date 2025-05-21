@@ -51,8 +51,4 @@ TEST(CommandContextTest, GetArgumentOutOfBounds) {
     // Test with index greater than size
     EXPECT_EQ(ctx.getArgument(5), "");
 
-    // Note: Negative index test is not applicable as parameter is size_t (unsigned)
-    // If it were int, we would test: EXPECT_EQ(ctx.getArgument(-1), "");
-    // For size_t, a large positive value that wraps around when treated as negative 
-    // would effectively be a very large positive index, already covered by "greater than size".
 }
