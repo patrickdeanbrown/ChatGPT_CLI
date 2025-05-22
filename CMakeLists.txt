@@ -59,6 +59,7 @@ FetchContent_Declare(ftxui
 )
 FetchContent_MakeAvailable(ftxui)
 
+
 # Add FTXUI include directory to the chatgpt_cli target
 target_include_directories(chatgpt_cli PRIVATE ${ftxui_SOURCE_DIR}/include)
 
