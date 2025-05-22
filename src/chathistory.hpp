@@ -26,22 +26,14 @@ class ChatHistory
      */
     void removeLastDialog();
 
-    /**
-     * @brief Prints the most recent dialog entry to the console.
-     * If the history is empty, prints a warning.
-     */
-    void printLastDialog() const;
+    // printLastDialog() declaration removed
 
     /**
      * @brief Clears all dialog entries from the chat history.
      */
     void clearHistory();
 
-    /**
-     * @brief Prints the entire chat history to the console.
-     * If the history is empty, prints a warning.
-     */
-    void printHistory() const;
+    // printHistory() declaration removed
 
     /**
      * @brief Converts the chat history to a formatted string.
@@ -93,10 +85,6 @@ class ChatHistory
     std::vector<std::pair<std::string, std::string>> m_chatHistory;
 };
 
-/// @brief Pretty prints a single chat dialog, a pair of the chat participant ("user" or "agent") and their response.
-///
-/// @param chatDialog &std::pair<std::string, std::string> a single entry in a ChatHistory that is a pair of
-/// the chat participant ("user" or "agent") and their response as std::string.
-void printFormatted(const std::pair<std::string, std::string> &chatDialog);
+// printFormatted() declaration removed
 
 #endif /* chathistory_hpp */
