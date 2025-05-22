@@ -22,7 +22,7 @@
 std::string userInput;
 ftxui::Component inputComponent;
 ftxui::Component historyComponent;
-ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
+ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen().WithMouse();
 
 /**
  * @brief Entry point for the ChatGPT CLI application.
