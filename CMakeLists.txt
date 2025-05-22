@@ -31,7 +31,7 @@ find_package(nlohmann_json REQUIRED)
 add_library(chatgpt_cli_lib STATIC ${SOURCES} ${HEADERS})
 target_include_directories(chatgpt_cli_lib PUBLIC 
     ${CMAKE_SOURCE_DIR}/src
-    ${ftxui_SOURCE_DIR}/include # Add FTXUI include directory
+    ${ftxui_SOURCE_DIR}/include 
 )
 # target_link_libraries(chatgpt_cli_lib termcolor::termcolor CURL::libcurl nlohmann_json::nlohmann_json) # termcolor removed
 target_link_libraries(chatgpt_cli_lib CURL::libcurl nlohmann_json::nlohmann_json) # termcolor removed
