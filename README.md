@@ -45,7 +45,7 @@ This project was developed with the following objectives:
 
 2. **Clone the Repository**:
    ```sh
-   git clone https://github.com/your-repo/ChatGPT_CLI.git
+   git clone https://github.com/patrickdeanbrown/ChatGPT_CLI/
    cd ChatGPT_CLI
    ```
 
