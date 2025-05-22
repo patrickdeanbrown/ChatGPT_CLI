@@ -1,5 +1,5 @@
 // ChatGPT CLI - A CLI interface for chatting with ChatGPT
-// Copyright (C) 2023 - Patrick Brown
+// Copyright (C) 2025 - Patrick Brown
 
 #include "chatgptapi.hpp"
 #include "command.hpp"
@@ -13,7 +13,7 @@
 // FTXUI Headers
 #include <ftxui/component/screen_interactive.hpp> // For ScreenInteractive
 #include <ftxui/component/component.hpp>         // For Component, Renderer, Vertical, Horizontal
-#include <ftxui/component/input.hpp>            // For Input
+#include <ftxui/component/component_options.hpp> // For InputOption and other component options
 #include <ftxui/dom/elements.hpp>               // For text, vbox, hbox, border, flex, separator, paragraph
 #include <ftxui/component/resizable_split.hpp>  // For ResizableSplitBottom
 #include <ftxui/screen/color.hpp>               // For ftxui::Color
