@@ -38,6 +38,7 @@ int main()
     checkOpenAIKeyOrExit();
     CommandContext commandContext; 
     ChatHistory chatHistory;       // Actual chat history store
+    int historyPaneSize{20};
 
     // Input component options and on_enter handler
     auto input_option = ftxui::InputOption();
@@ -103,7 +104,7 @@ int main()
     });
 
     // Layout
-    auto layout = ftxui::ResizableSplitBottom(historyComponent, inputComponent);
+    auto layout = ftxui::ResizableSplitBottom(historyComponent, inputComponent, &historyPaneSize);
     layout = layout | ftxui::border; 
 
     // Run the FTXUI loop
