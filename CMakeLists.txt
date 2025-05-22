@@ -29,9 +29,13 @@ find_package(nlohmann_json REQUIRED)
 
 # Build static library from all code except main.cpp
 add_library(chatgpt_cli_lib STATIC ${SOURCES} ${HEADERS})
-target_include_directories(chatgpt_cli_lib PUBLIC ${CMAKE_SOURCE_DIR}/src)
+target_include_directories(chatgpt_cli_lib PUBLIC 
+    ${CMAKE_SOURCE_DIR}/src
+    ${ftxui_SOURCE_DIR}/include # Add FTXUI include directory
+)
 # target_link_libraries(chatgpt_cli_lib termcolor::termcolor CURL::libcurl nlohmann_json::nlohmann_json) # termcolor removed
 target_link_libraries(chatgpt_cli_lib CURL::libcurl nlohmann_json::nlohmann_json) # termcolor removed
+# No need to link chatgpt_cli_lib against ftxui::ftxui here if FTXUI is header-only or linked by final executable
 
 # CLI executable links to the library
 add_executable(chatgpt_cli src/main.cpp)
@@ -67,6 +71,13 @@ enable_testing()
 
 file(GLOB TEST_SOURCES tests/*.cpp)
 add_executable(unit_tests ${TEST_SOURCES})
-target_link_libraries(unit_tests gtest_main chatgpt_cli_lib)
-target_include_directories(unit_tests PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(unit_tests 
+    PRIVATE # This PRIVATE applies to all libraries listed below
+    gtest_main 
+    chatgpt_cli_lib
+    ftxui::screen
+    ftxui::dom
+    ftxui::component
+)
+target_include_directories(unit_tests PRIVATE ${CMAKE_SOURCE_DIR}/src) # Already has ftxui includes via chatgpt_cli_lib PUBLIC
 add_test(NAME unit_tests COMMAND unit_tests)

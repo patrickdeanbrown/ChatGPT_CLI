@@ -26,6 +26,28 @@ class ChatHistory
      */
     void removeLastDialog();
 
+    /**
+     * @brief Appends content to the last dialog entry if it's from the "assistant".
+     * If the history is empty or the last message is not from the assistant,
+     * it might add a new dialog or do nothing, depending on desired behavior.
+     * For now, let's assume it only appends if the last is an assistant message.
+     * @param content_chunk The piece of content to append.
+     */
+    void appendToLastDialog(const std::string& content_chunk);
+
+    /**
+     * @brief Gets the last dialog entry.
+     * @return A pair containing the participant name and message.
+     * @throws std::out_of_range if the history is empty.
+     */
+    std::pair<std::string, std::string> getLastDialog() const;
+
+    /**
+     * @brief Checks if the chat history is empty.
+     * @return True if history is empty, false otherwise.
+     */
+    bool isEmpty() const;
+
     // printLastDialog() declaration removed
 
     /**

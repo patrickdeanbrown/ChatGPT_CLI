@@ -23,7 +23,8 @@ TEST(ChatGPTAPITest, HandlesMockedAPIResponse) {
     ChatHistory history;
     history.addDialog("user", "Hello?");
     // The mock will return a canned JSON string
-    callChatGPTAPI("Hello?", history, mockRequest);
+    // Pass nullptr for the ScreenInteractive* argument as tests don't use UI.
+    callChatGPTAPI("Hello?", history, nullptr);
     std::string output = history.toString();
     // Should contain both user and assistant reply
     EXPECT_NE(output.find("user"), std::string::npos);
@@ -44,7 +45,8 @@ TEST(ChatGPTAPITest, HandlesEmptyInput) {
     // API is called with empty input.
     // callChatGPTAPI will call printLastDialog (history is empty, so it prints error and returns),
     // then add assistant's response.
-    callChatGPTAPI("", history, mockRequest); 
+    // Pass nullptr for the ScreenInteractive* argument.
+    callChatGPTAPI("", history, nullptr); 
     
     std::cerr.rdbuf(oldCerr);
 
@@ -90,7 +92,8 @@ TEST(ChatGPTAPITest, HandlesAPIErrorResponse) {
     std::ostringstream newCerr;
     std::cerr.rdbuf(newCerr.rdbuf());
 
-    callChatGPTAPI("Error prone input", history, mockErrorRequest);
+    // Pass nullptr for the ScreenInteractive* argument.
+    callChatGPTAPI("Error prone input", history, nullptr);
     
     // Restore cerr
     std::cerr.rdbuf(oldCerr);

@@ -50,7 +50,7 @@ int main()
         std::string originalUserInput = userInput; // Store before clearing
 
         // Add user input to the actual ChatHistory
-        chatHistory.addDialog("user", originalUserInput);
+        // chatHistory.addDialog("user", originalUserInput); // Disabled: makeRequest now handles this
 
         // Clear the input field before processing, so UI feels responsive
         userInput.clear(); 
@@ -67,17 +67,34 @@ int main()
                     chatHistory.addDialog("system", "Error processing command: " + std::string(e.what()));
                 }
             } else {
+                // Add "Assistant is thinking..." message and refresh screen
+                chatHistory.addDialog("system", "Assistant is thinking...");
+                screen.PostEvent(ftxui::Event::Custom); // Ensure "thinking" message is displayed
+
                 // callChatGPTAPI is expected to add assistant's response or errors to chatHistory
                 // It might also throw, e.g., if network fails.
                 try {
-                    callChatGPTAPI(originalUserInput, chatHistory);
+                    // Pass the screen object for streaming updates
+                    callChatGPTAPI(originalUserInput, chatHistory, &screen);
                 } catch (const std::exception& e) {
-                    chatHistory.addDialog("system", "Error calling API: " + std::string(e.what()));
+                    // If callChatGPTAPI itself throws an exception (e.g., very fundamental issue, though most errors should be handled internally)
+                    // First, try to remove "Assistant is thinking..." if it's still the last message
+                    if (!chatHistory.isEmpty()) {
+                        auto lastDialog = chatHistory.getLastDialog();
+                        if (lastDialog.first == "system" && lastDialog.second == "Assistant is thinking...") {
+                            chatHistory.removeLastDialog();
+                        }
+                    }
+                    chatHistory.addDialog("system", "Critical Error calling API: " + std::string(e.what()));
+                     screen.PostEvent(ftxui::Event::Custom); // Refresh to show the error
                 }
             }
         }
-        
-        screen.PostEvent(ftxui::Event::Custom); // Force redraw to show new history/output
+        // The general screen.PostEvent at the end of on_enter might be redundant if callChatGPTAPI's
+        // _writeCallback always posts events for stream updates, and error conditions above also post.
+        // However, command handling still needs this, so it can be kept, or logic made more specific.
+        // For now, specific posts have been added, and this one will ensure commands also refresh.
+        screen.PostEvent(ftxui::Event::Custom); 
     };
     inputComponent = ftxui::Input(&userInput, "Enter message or command (e.g. %help, %quit)", input_option);
 
@@ -100,7 +117,7 @@ int main()
             }
             history_elements.push_back(element);
         }
-        return ftxui::vbox(history_elements) | ftxui::yframe | ftxui::flex;
+        return ftxui::vbox(history_elements) | ftxui::yframe | ftxui::inverted;
     });
 
     // Layout

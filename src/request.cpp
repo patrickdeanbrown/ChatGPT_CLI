@@ -8,117 +8,177 @@
 #include <curl/curl.h>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <sstream> // Required for parsing SSE
 
-std::string makeRequest(const std::string &message, ChatHistory &chatHistory)
+// StreamCallbackData struct is defined in request.hpp
+
+std::string makeRequest(const std::string &message, ChatHistory &chatHistory, ftxui::ScreenInteractive* screen_ptr)
 {
     // Add new user message to chat history
     chatHistory.addDialog("user", message);
 
     // Build JSON payload
     nlohmann::json payload;
-    payload["model"] = "gpt-4o"; // Updated to latest supported model
+    payload["model"] = "gpt-4o"; 
+    payload["stream"] = true; // Enable streaming
+    payload["messages"] = nlohmann::json::array(); // Ensure messages is an array
 
-    // Add chat history
     for (const auto &[role, content] : chatHistory)
     {
         payload["messages"].push_back({{"role", role}, {"content", content}});
     }
 
-    // Convert the JSON object to a string
     std::string payloadStr = payload.dump();
 
-    // Set up CURL
     CURL *curl = curl_easy_init();
     CURLcode res;
-    std::string response;
 
     if (curl)
     {
-        // Set the URL for the request
+        StreamCallbackData callbackData;
+        callbackData.chatHistory = &chatHistory;
+        callbackData.screen = screen_ptr;
+        callbackData.assistantMessageAdded = false;
+        callbackData.currentAssistantResponse = ""; 
+
         curl_easy_setopt(curl, CURLOPT_URL, "https://api.openai.com/v1/chat/completions");
-
-        // Set the request method to POST
         curl_easy_setopt(curl, CURLOPT_POST, 1L);
-
-        // Add in the payload
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payloadStr.c_str());
 
-        // Add necessary headers
         struct curl_slist *headers = nullptr;
         headers = curl_slist_append(headers, "Content-Type: application/json");
+        headers = curl_slist_append(headers, "Accept: text/event-stream");
 
-        // Get API KEY from environment and check for presence
         const char *api_key = std::getenv("OPENAI_KEY");
         if (api_key == nullptr || std::string(api_key).empty())
         {
-            std::cerr << "[ERROR] OPENAI_KEY environment variable not set. Please set it before running the CLI." << std::endl;
-            curl_easy_cleanup(curl);
-            curl_slist_free_all(headers);
-            return "";
+            std::cerr << "[ERROR] OPENAI_KEY environment variable not set." << std::endl;
+            if (curl) curl_easy_cleanup(curl);
+            if (headers) curl_slist_free_all(headers);
+            return "{\"error\": {\"message\": \"OPENAI_KEY environment variable not set.\"}}";
         }
         std::string auth_header = "Authorization: Bearer " + std::string(api_key);
         headers = curl_slist_append(headers, auth_header.c_str());
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-        // Function to receive the response
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, _writeCallback);
-
-        // Response data
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-
-        // Perform the request
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &callbackData);
+        
         res = curl_easy_perform(curl);
 
-        // Check for errors
         if (res != CURLE_OK)
         {
-            std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
+            std::string curl_error_message = curl_easy_strerror(res);
+            std::cerr << "curl_easy_perform() failed: " << curl_error_message << std::endl;
+            if (!callbackData.assistantMessageAdded) {
+                 chatHistory.addDialog("system", "API request failed: " + curl_error_message);
+                 if(screen_ptr) screen_ptr->PostEvent(ftxui::Event::Custom); 
+            }
+             if (curl) curl_easy_cleanup(curl); 
+             if (headers) curl_slist_free_all(headers);
+            return ""; 
         }
 
-        // Cleanup
-        curl_easy_cleanup(curl);
-        curl_slist_free_all(headers);
+        if (curl) curl_easy_cleanup(curl);
+        if (headers) curl_slist_free_all(headers);
     }
-
-    return response;
+    return ""; 
 }
 
 std::string getChatGPTResponseContent(const std::string &jsonStr)
 {
-    // Parse the response and extract the assistant's message content
+    if (jsonStr.empty()) {
+        return ""; 
+    }
+
     try {
         nlohmann::json jsonResponse = nlohmann::json::parse(jsonStr);
-        // If there is an error field, print it for the user
         if (jsonResponse.contains("error")) {
-            std::string errMsg = jsonResponse["error"].contains("message") ? jsonResponse["error"]["message"].get<std::string>() : "Unknown error";
-            std::cerr << "[OPENAI API ERROR] " << errMsg << std::endl;
-            // Optionally print more details if available
-            if (jsonResponse["error"].contains("type")) {
-                std::cerr << "  Type: " << jsonResponse["error"]["type"] << std::endl;
+            std::string errMsg = jsonResponse["error"].value("message", "Unknown error");
+            return "[API Error] " + errMsg;
+        }
+        if (jsonResponse.contains("choices") && jsonResponse["choices"].is_array() && !jsonResponse["choices"].empty()) {
+            if (jsonResponse["choices"][0].contains("message") && jsonResponse["choices"][0]["message"].contains("content")) {
+                 return jsonResponse["choices"][0]["message"]["content"].get<std::string>();
             }
-            if (jsonResponse["error"].contains("code")) {
-                std::cerr << "  Code: " << jsonResponse["error"]["code"] << std::endl;
-            }
-            return "";
         }
-        if (!jsonResponse.contains("choices") || !jsonResponse["choices"].is_array() || jsonResponse["choices"].empty()) {
-            std::cerr << "[ERROR] API response missing 'choices' array. Full response:\n" << jsonStr << std::endl;
-            return "";
-        }
-        if (!jsonResponse["choices"][0].contains("message") || !jsonResponse["choices"][0]["message"].contains("content")) {
-            std::cerr << "[ERROR] API response missing 'message.content'. Full response:\n" << jsonStr << std::endl;
-            return "";
-        }
-        std::string response = jsonResponse["choices"][0]["message"]["content"];
-        return response;
-    } catch (const std::exception &e) {
-        std::cerr << "[ERROR] Failed to parse API response: " << e.what() << "\nFull response:\n" << jsonStr << std::endl;
-        return "";
+        std::cerr << "[WARNING] getChatGPTResponseContent received unexpected JSON structure: " << jsonStr << std::endl;
+        return ""; 
+    } catch (const nlohmann::json::parse_error &e) {
+        std::cerr << "[ERROR] Failed to parse supposed API JSON response: " << e.what() << "\nFull text: " << jsonStr << std::endl;
+        return "[Error] Malformed response from server.";
     }
 }
 
 size_t _writeCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
-    ((std::string *)userp)->append((char *)contents, size * nmemb);
-    return size * nmemb;
+    size_t realsize = size * nmemb;
+    StreamCallbackData* data = static_cast<StreamCallbackData*>(userp);
+
+    std::string_view chunk_view(static_cast<char*>(contents), realsize);
+    std::string chunk_str(chunk_view);
+    std::istringstream chunk_stream(chunk_str);
+    std::string line;
+
+    while (std::getline(chunk_stream, line)) {
+        if (line.empty() || line[0] == ':') { 
+            continue;
+        }
+
+        if (line.rfind("data: ", 0) == 0) {
+            std::string jsonData = line.substr(6);
+            
+            if (jsonData == "[DONE]") {
+                if (data->screen) {
+                    data->screen->PostEvent(ftxui::Event::Custom); 
+                }
+                return realsize; 
+            }
+
+            try {
+                nlohmann::json j = nlohmann::json::parse(jsonData);
+                std::string delta_content;
+
+                if (j.contains("choices") && j["choices"].is_array() && !j["choices"].empty()) {
+                    const auto& choice = j["choices"][0];
+                    if (choice.contains("delta") && choice["delta"].is_object()) {
+                        const auto& delta = choice["delta"];
+                        if (delta.contains("content") && delta["content"].is_string()) {
+                            delta_content = delta["content"].get<std::string>();
+                        }
+                    }
+                } else if (j.contains("error")) { 
+                    delta_content = "[API Error] " + j["error"].value("message", "Unknown error from stream");
+                }
+
+                if (!delta_content.empty()) {
+                    data->currentAssistantResponse = delta_content; 
+
+                    if (!data->assistantMessageAdded) {
+                        if (!data->chatHistory->isEmpty()) {
+                            try {
+                                auto lastDialog = data->chatHistory->getLastDialog();
+                                if (lastDialog.first == "system" && lastDialog.second == "Assistant is thinking...") {
+                                    data->chatHistory->removeLastDialog();
+                                }
+                            } catch (const std::out_of_range& e) {
+                                std::cerr << "Error checking last dialog: " << e.what() << std::endl;
+                            }
+                        }
+                        data->chatHistory->addDialog("assistant", delta_content);
+                        data->assistantMessageAdded = true;
+                    } else {
+                        data->chatHistory->appendToLastDialog(delta_content);
+                    }
+                    
+                    if (data->screen) {
+                        data->screen->PostEvent(ftxui::Event::Custom);
+                    }
+                }
+            } catch (const nlohmann::json::parse_error& e) {
+                std::cerr << "JSON parse error in stream: " << e.what() << ". Data: '" << jsonData << "'" << std::endl;
+            }
+        }
+    }
+    return realsize; 
 }

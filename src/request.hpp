@@ -7,16 +7,32 @@
 
 #include "chathistory.hpp"
 #include <string>
+#include "ftxui/component/screen_interactive.hpp" // Required for ftxui::ScreenInteractive
+
+// Forward declaration of ChatHistory can be used if chathistory.hpp is heavy,
+// but for a pointer type, full include is often fine.
+// class ChatHistory; 
+
+struct StreamCallbackData {
+    ChatHistory* chatHistory;
+    ftxui::ScreenInteractive* screen;
+    std::string currentAssistantResponse; // Used to accumulate parts of the assistant's message
+    bool assistantMessageAdded;       // Tracks if the first chunk of the assistant's message has been added to ChatHistory
+    // std::string currentAssistantMessageId; // Not strictly needed if we append to last or replace last
+};
 
 /**
  * @brief Calls the ChatGPT API using cURL, sending a new message and chat history for context.
+ *        Supports streaming responses.
  *
  * @param message The next user message to send to ChatGPT.
  * @param chatHistory The chat history to provide context for the API request.
- * @return A JSON-formatted string containing the raw response from ChatGPT.
+ * @param screen Pointer to the FTXUI screen for posting refresh events during streaming.
+ * @return A JSON-formatted string (potentially empty or summary if streaming handled by callback)
+ *         or an error message if the initial request setup fails.
  * @throws std::runtime_error if the request fails or the response is invalid.
  */
-std::string makeRequest(const std::string &message, ChatHistory &chatHistory);
+std::string makeRequest(const std::string &message, ChatHistory &chatHistory, ftxui::ScreenInteractive* screen);
 
 /**
  * @brief Parses a raw JSON response to extract the content returned by the ChatGPT API.
