@@ -22,7 +22,7 @@
 std::string userInput;
 ftxui::Component inputComponent;
 ftxui::Component historyComponent;
-ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen().WithMouse();
+ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
 
 /**
  * @brief Entry point for the ChatGPT CLI application.
@@ -39,6 +39,8 @@ int main()
     CommandContext commandContext; 
     ChatHistory chatHistory;       // Actual chat history store
     int historyPaneSize{20};
+
+    screen.TrackMouse(true);
 
     // Input component options and on_enter handler
     auto input_option = ftxui::InputOption();
