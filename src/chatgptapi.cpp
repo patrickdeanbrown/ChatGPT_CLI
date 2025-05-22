@@ -11,9 +11,9 @@ void callChatGPTAPI(const std::string &input, ChatHistory &chatHistory, RequestF
     std::string apiResponse = requestFn(input, chatHistory);
     std::string chatGPTResponseContent = getChatGPTResponseContent(apiResponse);
 
-    chatHistory.printLastDialog(); // prints the user's input
+    // chatHistory.printLastDialog(); // Removed, as this method no longer exists
     chatHistory.addDialog("assistant", chatGPTResponseContent);
-    chatHistory.printLastDialog(); // prints the content just returned from ChatGPT
+    // chatHistory.printLastDialog(); // Removed, as this method no longer exists
 }
 
 // Overload with default argument

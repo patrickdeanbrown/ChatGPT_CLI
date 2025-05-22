@@ -7,95 +7,118 @@
 #include "chathistory.hpp"
 #include "commandcontext.hpp"
 #include "filereadwrite.hpp"
-#include "formatting.hpp"
+#include "formatting.hpp" // For std::setw, std::left if used in help construction
 #include <cstdlib>
 #include <fstream>
-#include <sstream>
+#include <sstream> // For std::ostringstream
 #include <stdexcept>
 #include <string>
-#include <termcolor/termcolor.hpp>
+// #include <termcolor/termcolor.hpp> // No longer needed
 #include <vector>
+#include <iomanip> // For std::setw, std::left
 
 void handleCommand(const CommandContext &commandContext, ChatHistory &chatHistory)
 {
-    if (commandContext.getCommand() == "%save")
+    std::string command = commandContext.getCommand();
+    if (command == "%save")
     {
         std::string outputfileName;
         try
         {
             outputfileName = commandContext.getArgument(0);
         }
-        catch (std::out_of_range &e)
+        catch (const std::out_of_range &e)
         {
-            std::cerr << "File name not correctly read as argument to %save. Using default 'outfile.txt'." << std::endl;
-            outputfileName = "outfile.txt";
+            outputfileName = "outfile.txt"; // Default filename
+            chatHistory.addDialog("system", "No filename provided for %save. Using default: " + outputfileName);
         }
         saveCommand(outputfileName, chatHistory);
     }
-    else if (commandContext.getCommand() == "%readfile")
+    else if (command == "%readfile")
     {
         std::string inputFilename;
         try
         {
             inputFilename = commandContext.getArgument(0);
         }
-        catch (std::out_of_range &e)
+        catch (const std::out_of_range &e)
         {
-            std::cerr << "File name not correctly read as argument to %readfile." << std::endl;
+            chatHistory.addDialog("error", "No filename provided for %readfile command.");
             return;
         }
         readfileCommand(inputFilename, chatHistory);
     }
-    else if (commandContext.getCommand() == "%clear")
+    else if (command == "%clear")
     {
         clearCommand(chatHistory);
     }
-    else if (commandContext.getCommand() == "%deletelast")
+    else if (command == "%deletelast")
     {
         deletelastCommand(chatHistory);
     }
-    else if (commandContext.getCommand() == "%printhistory")
+    else if (command == "%printhistory")
     {
         printhistoryCommand(chatHistory);
     }
-    else if (commandContext.getCommand() == "%help")
+    else if (command == "%help")
     {
-        helpCommand();
+        helpCommand(chatHistory); // Pass chatHistory to helpCommand
     }
-    else if (commandContext.getCommand() == "%quit")
+    else if (command == "%quit")
     {
         quitCommand();
     }
     else
     {
-        throw std::runtime_error("Unable to parse command.");
+        chatHistory.addDialog("error", "Unknown command: " + command + ". Type %help for a list of commands.");
     }
 }
 
 void saveCommand(const std::string &outputFilename, const ChatHistory &chatHistory)
 {
-    writeToFile(outputFilename, chatHistory.toString());
+    try
+    {
+        writeToFile(outputFilename, chatHistory.toString());
+        chatHistory.addDialog("system", "Chat history saved to " + outputFilename);
+    }
+    catch (const std::exception &e)
+    {
+        chatHistory.addDialog("error", "Error saving chat history to " + outputFilename + ": " + e.what());
+    }
 }
 
 void readfileCommand(const std::string &inputFilename, ChatHistory &chatHistory)
 {
-    std::string fileContent = readFileToString(inputFilename);
-    chatHistory.addDialog("user", fileContent);
+    try
+    {
+        std::string fileContent = readFileToString(inputFilename);
+        chatHistory.addDialog("user", fileContent); // As per original logic, file content is added as user dialog
+        chatHistory.addDialog("system", "Content from " + inputFilename + " added to chat history as a user message.");
+    }
+    catch (const std::exception &e)
+    {
+        chatHistory.addDialog("error", "Error reading file " + inputFilename + ": " + e.what());
+    }
 }
 
 void clearCommand(ChatHistory &chatHistory)
 {
     chatHistory.clearHistory();
+    chatHistory.addDialog("system", "Chat history cleared.");
 }
 
 void deletelastCommand(ChatHistory &chatHistory)
 {
+    // Consider checking if history was empty before removing, though removeLastDialog is safe.
+    // For simplicity, always add a confirmation.
     chatHistory.removeLastDialog();
+    chatHistory.addDialog("system", "Last dialog entry removed.");
 }
 
 void printhistoryCommand(const ChatHistory &chatHistory)
 {
-    chatHistory.printHistory();
+    // chatHistory.printHistory(); // Original call removed
+    chatHistory.addDialog("system", "Chat history is displayed in the pane above.");
 }
 
 void quitCommand()
@@ -103,23 +126,18 @@ void quitCommand()
     std::exit(0);
 }
 
-void helpCommand()
+void helpCommand(ChatHistory &chatHistory) // Added chatHistory parameter
 {
-    const int maxWidth = 30;
-    std::cout << "***** HELP MENU *****" << std::endl
-              << std::endl;
-    std::cout << std::left << std::setw(maxWidth) << "%save [filename]"
-              << "Saves your chat as a file." << std::endl;
-    std::cout << std::left << std::setw(maxWidth) << "%readfile [filename]"
-              << "Reads in a file from the cwd." << std::endl;
-    std::cout << std::left << std::setw(maxWidth) << "%clear"
-              << "Clears the chat history." << std::endl;
-    std::cout << std::left << std::setw(maxWidth) << "%deletelast"
-              << "Deletes the last record in the chat history." << std::endl;
-    std::cout << std::left << std::setw(maxWidth) << "%printhistory"
-              << "Prints the chat history to the console." << std::endl;
-    std::cout << std::left << std::setw(maxWidth) << "%quit"
-              << "Exits the program." << std::endl;
-    std::cout << std::left << std::setw(maxWidth) << "%help"
-              << "Prints the help menu." << std::endl;
+    const int maxWidth = 20; // Adjusted for typical chat display
+    std::ostringstream help_oss;
+    help_oss << "***** HELP MENU *****\n\n"; // Use \n for newlines
+    help_oss << std::left << std::setw(maxWidth) << "%save [filename]" << "Saves your chat as a file.\n";
+    help_oss << std::left << std::setw(maxWidth) << "%readfile [filename]" << "Reads a file into history as user message.\n";
+    help_oss << std::left << std::setw(maxWidth) << "%clear" << "Clears the chat history.\n";
+    help_oss << std::left << std::setw(maxWidth) << "%deletelast" << "Deletes the last record in chat history.\n";
+    help_oss << std::left << std::setw(maxWidth) << "%printhistory" << "Shows this message (history is above).\n";
+    help_oss << std::left << std::setw(maxWidth) << "%quit" << "Exits the program.\n";
+    help_oss << std::left << std::setw(maxWidth) << "%help" << "Prints this help menu.\n";
+    
+    chatHistory.addDialog("system", help_oss.str());
 }

@@ -10,7 +10,6 @@ set(SOURCES
     src/formatting.cpp
     src/request.cpp
     src/apikeycheck.cpp
-    external/linenoise/linenoise.c
 )
 
 set(HEADERS
@@ -26,17 +25,22 @@ set(HEADERS
 find_package(CURL REQUIRED)
 find_package(nlohmann_json REQUIRED)
 # find_package(termcolor REQUIRED) # Removed: termcolor is now a subdirectory
-add_subdirectory(external/termcolor)
+# add_subdirectory(external/termcolor) # Removed
 
 # Build static library from all code except main.cpp
 add_library(chatgpt_cli_lib STATIC ${SOURCES} ${HEADERS})
 target_include_directories(chatgpt_cli_lib PUBLIC ${CMAKE_SOURCE_DIR}/src)
-target_link_libraries(chatgpt_cli_lib termcolor::termcolor CURL::libcurl nlohmann_json::nlohmann_json)
+# target_link_libraries(chatgpt_cli_lib termcolor::termcolor CURL::libcurl nlohmann_json::nlohmann_json) # termcolor removed
+target_link_libraries(chatgpt_cli_lib CURL::libcurl nlohmann_json::nlohmann_json) # termcolor removed
 
 # CLI executable links to the library
 add_executable(chatgpt_cli src/main.cpp)
-target_link_libraries(chatgpt_cli PRIVATE chatgpt_cli_lib)
-target_include_directories(chatgpt_cli PRIVATE external/linenoise)
+target_link_libraries(chatgpt_cli 
+    PRIVATE chatgpt_cli_lib
+    PRIVATE ftxui::screen
+    PRIVATE ftxui::dom
+    PRIVATE ftxui::component
+)
 
 # --- GoogleTest Setup ---
 include(FetchContent)
@@ -47,6 +51,14 @@ FetchContent_Declare(
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+
+set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE) # Recommended by FTXUI to avoid re-fetching on every configure
+FetchContent_Declare(ftxui
+    GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
+    GIT_TAG v6.1.9 # Use a specific tag for version consistency
+)
+FetchContent_MakeAvailable(ftxui)
+
 enable_testing()
 
 file(GLOB TEST_SOURCES tests/*.cpp)

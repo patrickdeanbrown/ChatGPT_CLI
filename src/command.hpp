@@ -47,6 +47,7 @@ void printhistoryCommand(const ChatHistory &chatHistory);
 void quitCommand();
 
 /// @brief Prints a table of possible commands and their functionality
-void helpCommand();
+/// @param chatHistory ChatHistory& the ChatHistory to add the help text to
+void helpCommand(ChatHistory &chatHistory);
 
 #endif /* command_hpp */
