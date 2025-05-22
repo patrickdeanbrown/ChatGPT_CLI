@@ -15,7 +15,6 @@
 #include <ftxui/component/component.hpp>         // For Component, Renderer, Vertical, Horizontal
 #include <ftxui/component/component_options.hpp> // For InputOption and other component options
 #include <ftxui/dom/elements.hpp>               // For text, vbox, hbox, border, flex, separator, paragraph
-#include <ftxui/component/resizable_split.hpp>  // For ResizableSplitBottom
 #include <ftxui/screen/color.hpp>               // For ftxui::Color
 #include <string>                               // For std::string
 
