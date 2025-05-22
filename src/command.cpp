@@ -74,7 +74,7 @@ void handleCommand(const CommandContext &commandContext, ChatHistory &chatHistor
     }
 }
 
-void saveCommand(const std::string &outputFilename, const ChatHistory &chatHistory)
+void saveCommand(const std::string &outputFilename, ChatHistory &chatHistory)
 {
     try
     {
@@ -115,7 +115,7 @@ void deletelastCommand(ChatHistory &chatHistory)
     chatHistory.addDialog("system", "Last dialog entry removed.");
 }
 
-void printhistoryCommand(const ChatHistory &chatHistory)
+void printhistoryCommand(ChatHistory &chatHistory)
 {
     // chatHistory.printHistory(); // Original call removed
     chatHistory.addDialog("system", "Chat history is displayed in the pane above.");

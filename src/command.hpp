@@ -19,8 +19,8 @@ void handleCommand(const CommandContext &commandContext, ChatHistory &chatHistor
 /// @brief Saves the chat history to a file in the current working directory
 ///
 /// @param outputFilename const std::string& the name of the file to write
-/// @param chatHistory ChatHistory& the chat history to write to the output file
-void saveCommand(const std::string &outputFilename, const ChatHistory &chatHistory);
+/// @param chatHistory ChatHistory& the chat history to write to the output file, modified with status messages.
+void saveCommand(const std::string &outputFilename, ChatHistory &chatHistory);
 
 /// @brief Reads a file and adds the file as a user dialog to chatHistory
 ///
@@ -38,10 +38,10 @@ void clearCommand(ChatHistory &chatHistory);
 /// @param chatHistory ChatHistory& the ChatHistory where the last entry will be deleted
 void deletelastCommand(ChatHistory &chatHistory);
 
-/// @brief Pretty prints the entire chat history
+/// @brief Adds a message to chat history indicating it's displayed above.
 ///
-/// @param chatHistory ChatHistory& the ChatHistory to print
-void printhistoryCommand(const ChatHistory &chatHistory);
+/// @param chatHistory ChatHistory& the ChatHistory to be modified with a status message.
+void printhistoryCommand(ChatHistory &chatHistory);
 
 /// @brief Exits the program
 void quitCommand();
